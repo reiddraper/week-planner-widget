@@ -1,0 +1,10 @@
+{
+  "name": "weekly-calendar",
+  "id": "widget-id-IjTJPdJPFR",
+  "api": "1.0.0",
+  "editorType": ["figjam"],
+  "permissions": [],
+  "containsWidget": true,
+  "main": "dist/main.js",
+  "widgetApi": "1.0.0"
+}
