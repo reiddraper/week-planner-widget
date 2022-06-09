@@ -108,7 +108,7 @@ function dayOfWeekString(dayOfWeek: DaysOfWeek): string {
   }
 }
 
-enum Months {
+enum Month {
   JANUARY = "JANUARY",
   FEBRUARY = "FEBRUARY",
   MARCH = "MARCH",
@@ -123,31 +123,31 @@ enum Months {
   DECEMBER = "DECEMBER",
 }
 
-function monthString(monthOfYear: Months): string {
+function monthString(monthOfYear: Month): string {
   switch (monthOfYear) {
-    case Months.JANUARY:
+    case Month.JANUARY:
       return "January";
-    case Months.FEBRUARY:
+    case Month.FEBRUARY:
       return "February";
-    case Months.MARCH:
+    case Month.MARCH:
       return "March";
-    case Months.APRIL:
+    case Month.APRIL:
       return "April";
-    case Months.MAY:
+    case Month.MAY:
       return "May";
-    case Months.JUNE:
+    case Month.JUNE:
       return "June";
-    case Months.JULY:
+    case Month.JULY:
       return "July";
-    case Months.AUGUST:
+    case Month.AUGUST:
       return "August";
-    case Months.SEPTEMBER:
+    case Month.SEPTEMBER:
       return "September";
-    case Months.OCTOBER:
+    case Month.OCTOBER:
       return "October";
-    case Months.NOVEMBER:
+    case Month.NOVEMBER:
       return "November";
-    case Months.DECEMBER:
+    case Month.DECEMBER:
       return "December";
   }
 }
@@ -218,27 +218,11 @@ enum MonthOnDayVisibility {
 }
 
 type DayProps = {
-  month: string;
+  month: Month;
   monthVisibility: MonthOnDayVisibility;
   dayNumber: number;
-  fillColor: string;
-} & Partial<FrameProps>;
-
-function day(
-  month: Months,
-  dayNumber: number,
-  monthColor: MonthColor,
-  monthVisibility: MonthOnDayVisibility,
-  x: number
-): Frame {
-  return Day({
-    month: monthString(month),
-    dayNumber,
-    fillColor: monthColorHex(monthColor),
-    monthVisibility,
-    x,
-  });
-}
+  monthColor: MonthColor;
+};
 
 function MonthNameInDay(month: string) {
   return (
@@ -291,13 +275,13 @@ function Day(props: DayProps) {
           topOffsetPercent: 0,
           bottomOffsetPercent: 0,
         }}
-        fill={props.fillColor}
+        fill={monthColorHex(props.monthColor)}
         stroke="#B6B6B6"
         width={400}
         height={400}
       />
       <Text
-        name="1"
+        name="Day number"
         x={{
           type: "horizontal-scale",
           leftOffsetPercent: 67.5,
@@ -325,253 +309,75 @@ function Day(props: DayProps) {
   );
 }
 
-function WeeklyCalendar() {
-  console.log(`Days of week: ${datesFromThisWeek(new Date())}`);
+function DayLabels() {
   return (
-    <Frame name="_12Weeks400X400" width={2900} height={3300}>
-      <Frame
-        name="W1"
-        y={100}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {day(
-          Months.JUNE,
-          5,
-          MonthColor.HIGHLIGHT,
-          MonthOnDayVisibility.VISIBLE,
-          100
-        )}
-        {[
-          [6, 500],
-          [7, 900],
-          [8, 1300],
-          [9, 1700],
-          [10, 2100],
-          [11, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JUNE,
-            dayNumber,
-            MonthColor.HIGHLIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(1, MonthColor.HIGHLIGHT)}
-      </Frame>
-      <DayLabel dayOfWeek="Monday" x={100} />
-      <DayLabel dayOfWeek="Tuesday" x={500} />
-      <DayLabel dayOfWeek="Wednesday" x={900} />
-      <DayLabel dayOfWeek="Thursday" x={1300} />
-      <DayLabel dayOfWeek="Friday" x={1700} />
-      <DayLabel dayOfWeek="Saturday" x={2100} />
-      <DayLabel dayOfWeek="Sunday" x={2500} />
-      <Frame
-        name="W2"
-        y={500}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [12, 100],
-          [13, 500],
-          [14, 900],
-          [15, 1300],
-          [16, 1700],
-          [17, 2100],
-          [18, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JUNE,
-            dayNumber,
-            MonthColor.HIGHLIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(2, MonthColor.HIGHLIGHT)}
-      </Frame>
-      <Frame
-        name="W3"
-        y={900}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [19, 100],
-          [20, 500],
-          [21, 900],
-          [22, 1300],
-          [23, 1700],
-          [24, 2100],
-          [25, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JUNE,
-            dayNumber,
-            MonthColor.HIGHLIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(3, MonthColor.HIGHLIGHT)}
-      </Frame>
-      <Frame
-        name="W4"
-        y={1300}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [26, 100],
-          [27, 500],
-          [28, 900],
-          [29, 1300],
-          [30, 1700],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JUNE,
-            dayNumber,
-            MonthColor.HIGHLIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {day(
-          Months.JULY,
-          1,
-          MonthColor.LIGHT,
-          MonthOnDayVisibility.VISIBLE,
-          2100
-        )}
-        {day(
-          Months.JULY,
-          2,
-          MonthColor.LIGHT,
-          MonthOnDayVisibility.HIDDEN,
-          2500
-        )}
-        {weekLabel(4, MonthColor.HIGHLIGHT)}
-      </Frame>
-      <Frame
-        name="W5"
-        y={1700}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [3, 100],
-          [4, 500],
-          [5, 900],
-          [6, 1300],
-          [7, 1700],
-          [8, 2100],
-          [9, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JULY,
-            dayNumber,
-            MonthColor.LIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(5, MonthColor.LIGHT)}
-      </Frame>
-      <Frame
-        name="W6"
-        y={2100}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [10, 100],
-          [11, 500],
-          [12, 900],
-          [13, 1300],
-          [14, 1700],
-          [15, 2100],
-          [16, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JULY,
-            dayNumber,
-            MonthColor.LIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(6, MonthColor.LIGHT)}
-      </Frame>
-      <Frame
-        name="W7"
-        y={2500}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [17, 100],
-          [18, 500],
-          [19, 900],
-          [20, 1300],
-          [21, 1700],
-          [22, 2100],
-          [23, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JULY,
-            dayNumber,
-            MonthColor.LIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(7, MonthColor.LIGHT)}
-      </Frame>
-      <Frame
-        name="W8"
-        y={2900}
-        strokeWidth={0}
-        overflow="visible"
-        width={2900}
-        height={400}
-      >
-        {[
-          [24, 100],
-          [25, 500],
-          [26, 900],
-          [27, 1300],
-          [28, 1700],
-          [29, 2100],
-          [30, 2500],
-        ].map(([dayNumber, x]) =>
-          day(
-            Months.JULY,
-            dayNumber,
-            MonthColor.LIGHT,
-            MonthOnDayVisibility.HIDDEN,
-            x
-          )
-        )}
-        {weekLabel(8, MonthColor.LIGHT)}
-      </Frame>
-    </Frame>
+    <AutoLayout
+      name="Day Labels"
+      overflow="visible"
+      horizontalAlignItems="center"
+      verticalAlignItems="center"
+      // align the day labels correctly
+      padding={{
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 100,
+      }}
+    >
+      <DayLabel dayOfWeek="Monday" />
+      <DayLabel dayOfWeek="Tuesday" />
+      <DayLabel dayOfWeek="Wednesday" />
+      <DayLabel dayOfWeek="Thursday" />
+      <DayLabel dayOfWeek="Friday" />
+      <DayLabel dayOfWeek="Saturday" />
+      <DayLabel dayOfWeek="Sunday" />
+    </AutoLayout>
   );
 }
 
-widget.register(WeeklyCalendar);
+type WeekProps = {
+  // used to highlight (or not) the current week
+  weekNumber: number;
+  weekLabel: MonthColor;
+  days: DayProps[];
+};
+
+function Week(props: WeekProps): AutoLayout {
+  return (
+    <AutoLayout
+      name="W1"
+      y={100}
+      strokeWidth={0}
+      overflow="visible"
+      width={2900}
+      height={400}
+    >
+      {weekLabel(props.weekNumber, props.weekLabel)}
+      {props.days.map((day) => Day(day))}
+    </AutoLayout>
+  );
+}
+
+type WeeklyCalendarProps = {
+  weeks: WeekProps[];
+};
+
+function WeeklyCalendar(props: WeeklyCalendarProps) {
+  console.log(`Days of week: ${datesFromThisWeek(new Date())}`);
+  return (
+    <AutoLayout
+      name="Calendar"
+      direction="vertical"
+      horizontalAlignItems="center"
+    >
+      {DayLabels()}
+      {props.weeks.map((week) => Week(week))}
+    </AutoLayout>
+  );
+}
+
+function Planner(): AutoLayout {
+  return WeeklyCalendar({ weeks: [] });
+}
+
+widget.register(Planner);
