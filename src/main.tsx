@@ -1,5 +1,15 @@
 const { widget } = figma;
-const { AutoLayout, Ellipse, Frame, Image, Rectangle, SVG, Text } = widget;
+const {
+  AutoLayout,
+  Ellipse,
+  Frame,
+  Input,
+  Image,
+  Rectangle,
+  SVG,
+  Text,
+  useSyncedState,
+} = widget;
 
 import { getWeek } from "date-fns";
 import { nWeeksFromDate } from "./date";
@@ -182,32 +192,32 @@ function monthFromDate(date: Date): Month {
   return monthFromNumber(date.getMonth());
 }
 
-function monthString(monthOfYear: Month): string {
+function monthName(monthOfYear: Month): string {
   switch (monthOfYear) {
     case Month.JANUARY:
-      return "January";
+      return "Jan";
     case Month.FEBRUARY:
-      return "February";
+      return "Feb";
     case Month.MARCH:
-      return "March";
+      return "Mar";
     case Month.APRIL:
-      return "April";
+      return "Apr";
     case Month.MAY:
       return "May";
     case Month.JUNE:
-      return "June";
+      return "Jun";
     case Month.JULY:
-      return "July";
+      return "Jul";
     case Month.AUGUST:
-      return "August";
+      return "Aug";
     case Month.SEPTEMBER:
-      return "September";
+      return "Sep";
     case Month.OCTOBER:
-      return "October";
+      return "Oct";
     case Month.NOVEMBER:
-      return "November";
+      return "Nov";
     case Month.DECEMBER:
-      return "December";
+      return "Dec";
   }
 }
 
@@ -313,7 +323,7 @@ function MonthNameInDay(month: string) {
 function Day(props: DayProps) {
   const maybeMonthName =
     props.monthVisibility === MonthOnDayVisibility.VISIBLE
-      ? MonthNameInDay(props.month)
+      ? MonthNameInDay(monthName(props.month))
       : null;
   return (
     <Frame
@@ -369,6 +379,10 @@ function Day(props: DayProps) {
   );
 }
 
+function Settings() {
+  return <Frame name="Settings" fill="#FFF" width={100} height={100} />;
+}
+
 function DayLabels() {
   return (
     <AutoLayout
@@ -376,14 +390,8 @@ function DayLabels() {
       overflow="visible"
       horizontalAlignItems="center"
       verticalAlignItems="center"
-      // align the day labels correctly
-      padding={{
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 100,
-      }}
     >
+      <Settings />
       <DayLabel dayOfWeek="Monday" />
       <DayLabel dayOfWeek="Tuesday" />
       <DayLabel dayOfWeek="Wednesday" />
@@ -421,8 +429,34 @@ function Week(props: WeekProps): AutoLayout {
 }
 
 type WeeklyCalendarProps = {
+  title: string;
   weeks: WeekProps[];
 };
+
+function Title(title: string) {
+  return (
+    <Input
+      name="Title"
+      positioning="absolute"
+      fill="#000"
+      lineHeight="150%"
+      fontFamily="Inter"
+      fontSize={140}
+      letterSpacing={-5.632}
+      fontWeight={700}
+      x={0}
+      y={-285}
+      placeholder="12-week planner"
+      value={title}
+      onTextEditEnd={(event) => {
+        const [_title, setTitle] = useSyncedState(title, "");
+        setTitle(event.characters);
+      }}
+      width={2900}
+      horizontalAlignText="left"
+    ></Input>
+  );
+}
 
 function WeeklyCalendar(props: WeeklyCalendarProps) {
   return (
@@ -430,7 +464,9 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
       name="Calendar"
       direction="vertical"
       horizontalAlignItems="center"
+      overflow="visible"
     >
+      {Title(props.title)}
       {DayLabels()}
       {props.weeks.map((week) => Week(week))}
     </AutoLayout>
@@ -475,10 +511,11 @@ function setMonthVisibility(weeks: WeekProps[]): void {
 }
 
 function Planner(): AutoLayout {
-  const weeks = nWeeksFromDate(new Date(2022, 0, 1), 52);
+  const [title, _setTitle] = useSyncedState("title", "");
+  const weeks = nWeeksFromDate(new Date(), 12);
   const weekProps = weeks.map((week, index) => datesToWeekProps(week, index));
   setMonthVisibility(weekProps);
-  return WeeklyCalendar({ weeks: weekProps });
+  return WeeklyCalendar({ weeks: weekProps, title });
 }
 
 widget.register(Planner);
