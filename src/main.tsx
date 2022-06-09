@@ -1,7 +1,8 @@
 const { widget } = figma;
 const { AutoLayout, Ellipse, Frame, Image, Rectangle, SVG, Text } = widget;
 
-import { datesFromThisWeek } from "./date";
+import { getWeek } from "date-fns";
+import { nWeeksFromDate } from "./date";
 
 enum MonthColor {
   LIGHT = "LIGHT",
@@ -123,6 +124,64 @@ enum Month {
   DECEMBER = "DECEMBER",
 }
 
+const months: Month[] = [
+  Month.JANUARY,
+  Month.FEBRUARY,
+  Month.MARCH,
+  Month.APRIL,
+  Month.MAY,
+  Month.JUNE,
+  Month.JULY,
+  Month.AUGUST,
+  Month.SEPTEMBER,
+  Month.OCTOBER,
+  Month.NOVEMBER,
+  Month.DECEMBER,
+];
+
+function monthColor(month: Month): MonthColor {
+  switch (month) {
+    case Month.JANUARY:
+      return MonthColor.LIGHT;
+    case Month.FEBRUARY:
+      return MonthColor.HIGHLIGHT;
+    case Month.MARCH:
+      return MonthColor.LIGHT;
+    case Month.APRIL:
+      return MonthColor.HIGHLIGHT;
+    case Month.MAY:
+      return MonthColor.LIGHT;
+    case Month.JUNE:
+      return MonthColor.HIGHLIGHT;
+    case Month.JULY:
+      return MonthColor.LIGHT;
+    case Month.AUGUST:
+      return MonthColor.HIGHLIGHT;
+    case Month.SEPTEMBER:
+      return MonthColor.LIGHT;
+    case Month.OCTOBER:
+      return MonthColor.HIGHLIGHT;
+    case Month.NOVEMBER:
+      return MonthColor.LIGHT;
+    case Month.DECEMBER:
+      return MonthColor.HIGHLIGHT;
+  }
+}
+
+function monthFromNumber(index: number): Month {
+  if (index > 11) {
+    return Month.DECEMBER;
+  } else if (index < 0) {
+    return Month.JANUARY;
+  } else {
+    return months[index];
+  }
+}
+
+function monthFromDate(date: Date): Month {
+  return monthFromNumber(date.getMonth());
+}
+
 function monthString(monthOfYear: Month): string {
   switch (monthOfYear) {
     case Month.JANUARY:
@@ -222,6 +281,7 @@ type DayProps = {
   monthVisibility: MonthOnDayVisibility;
   dayNumber: number;
   monthColor: MonthColor;
+  key: number;
 };
 
 function MonthNameInDay(month: string) {
@@ -261,7 +321,7 @@ function Day(props: DayProps) {
       overflow="visible"
       width={400}
       height={400}
-      {...props}
+      key={props.key}
     >
       <Rectangle
         name="Rectangle 1"
@@ -340,6 +400,7 @@ type WeekProps = {
   weekNumber: number;
   weekLabel: MonthColor;
   days: DayProps[];
+  key: number;
 };
 
 function Week(props: WeekProps): AutoLayout {
@@ -351,9 +412,10 @@ function Week(props: WeekProps): AutoLayout {
       overflow="visible"
       width={2900}
       height={400}
+      key={props.key}
     >
       {weekLabel(props.weekNumber, props.weekLabel)}
-      {props.days.map((day) => Day(day))}
+      {props.days.map((day, index) => Day(day))}
     </AutoLayout>
   );
 }
@@ -363,7 +425,6 @@ type WeeklyCalendarProps = {
 };
 
 function WeeklyCalendar(props: WeeklyCalendarProps) {
-  console.log(`Days of week: ${datesFromThisWeek(new Date())}`);
   return (
     <AutoLayout
       name="Calendar"
@@ -376,8 +437,48 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
   );
 }
 
+function dateToDayProps(date: Date, key: number): DayProps {
+  const month = monthFromDate(date);
+  return {
+    month,
+    monthVisibility: MonthOnDayVisibility.HIDDEN,
+    dayNumber: date.getDate(),
+    monthColor: monthColor(monthFromDate(date)),
+    key,
+  };
+}
+
+function datesToWeekProps(dates: Date[], key: number): WeekProps {
+  const dayProps = dates.map((date, index) => dateToDayProps(date, index));
+  // set this so we get the same week numbering as Google Calendar
+  const firstWeekContainsDate = 7;
+  // TODO: pass in option for start of week here
+  const weekNumber = getWeek(dates[0], { firstWeekContainsDate });
+  const weekLabel = monthColor(monthFromDate(dates[0]));
+  return { days: dayProps, weekNumber, weekLabel, key };
+}
+
+// Kind of hacky, would be more elegant if this
+// was set during initial creation, but this is
+// probably a little easier to do
+function setMonthVisibility(weeks: WeekProps[]): void {
+  let currentMonth = weeks[0].days[0].month;
+  weeks[0].days[0].monthVisibility = MonthOnDayVisibility.VISIBLE;
+  for (const week of weeks) {
+    for (const day of week.days) {
+      if (day.month !== currentMonth) {
+        day.monthVisibility = MonthOnDayVisibility.VISIBLE;
+        currentMonth = day.month;
+      }
+    }
+  }
+}
+
 function Planner(): AutoLayout {
-  return WeeklyCalendar({ weeks: [] });
+  const weeks = nWeeksFromDate(new Date(2022, 0, 1), 52);
+  const weekProps = weeks.map((week, index) => datesToWeekProps(week, index));
+  setMonthVisibility(weekProps);
+  return WeeklyCalendar({ weeks: weekProps });
 }
 
 widget.register(Planner);
