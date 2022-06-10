@@ -11,7 +11,7 @@ const {
   useSyncedState,
 } = widget;
 
-import { getWeek, isWeekend } from "date-fns";
+import { getWeek, isSameDay, isWeekend } from "date-fns";
 import { nWeeksFromDate } from "./date";
 
 enum MonthColor {
@@ -288,13 +288,34 @@ enum MonthOnDayVisibility {
 }
 
 type DayProps = {
+  settings: PlannerSettings;
   date: Date;
   month: Month;
   monthVisibility: MonthOnDayVisibility;
   dayNumber: number;
   monthColor: MonthColor;
-  key: number;
 };
+
+function TodayMarker(): Ellipse {
+  return (
+    <Ellipse
+      name="Current"
+      x={{
+        type: "horizontal-scale",
+        leftOffsetPercent: 71.5,
+        rightOffsetPercent: 22.5,
+      }}
+      y={{
+        type: "vertical-scale",
+        topOffsetPercent: 12,
+        bottomOffsetPercent: 82,
+      }}
+      fill="#F24822"
+      width={24}
+      height={24}
+    />
+  );
+}
 
 function MonthNameInDay(month: string) {
   return (
@@ -323,6 +344,9 @@ function MonthNameInDay(month: string) {
 }
 
 function Day(props: DayProps) {
+  const maybeTodayIndicator = isSameDay(props.date, props.settings.currentDay)
+    ? TodayMarker()
+    : null;
   const maybeMonthName =
     props.monthVisibility === MonthOnDayVisibility.VISIBLE
       ? MonthNameInDay(monthName(props.month))
@@ -333,7 +357,7 @@ function Day(props: DayProps) {
       overflow="visible"
       width={400}
       height={400}
-      key={props.key}
+      key={props.date.toDateString()}
     >
       <Rectangle
         name="Rectangle 1"
@@ -377,6 +401,7 @@ function Day(props: DayProps) {
         {props.dayNumber}
       </Text>
       {maybeMonthName}
+      {maybeTodayIndicator}
     </Frame>
   );
 }
@@ -422,31 +447,18 @@ function SettingsMenuOpenIcon(settings: PlannerSettings) {
 }
 
 function CheckIcon(checked: boolean): SVG {
-  if (checked) {
-    return (
-      <SVG
-        name="CheckIcon"
-        height={18}
-        width={27}
-        src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="#7D7D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  const strokeColor = checked ? "#7D7D7D" : "white";
+  return (
+    <SVG
+      name="CheckIcon"
+      height={18}
+      width={27}
+      src={`<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="${strokeColor}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            '
-      />
-    );
-  } else {
-    return (
-      <SVG
-        name="CheckIcon"
-        height={18}
-        width={27}
-        src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            '
-      />
-    );
-  }
+            `}
+    />
+  );
 }
 
 type WeekViewSettingOptionsProps = {
@@ -818,7 +830,6 @@ type WeekProps = {
   weekNumber: number;
   weekLabel: MonthColor;
   days: DayProps[];
-  key: number;
 };
 
 function Week(props: WeekProps): AutoLayout {
@@ -828,7 +839,7 @@ function Week(props: WeekProps): AutoLayout {
       y={100}
       strokeWidth={0}
       overflow="visible"
-      key={props.key}
+      key={props.weekNumber}
     >
       {weekLabel(props.weekNumber, props.weekLabel)}
       {props.days.map((day, index) => Day(day))}
@@ -886,7 +897,7 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
   );
 }
 
-function dateToDayProps(date: Date, key: number): DayProps {
+function dateToDayProps(date: Date, settings: PlannerSettings): DayProps {
   const month = monthFromDate(date);
   return {
     date,
@@ -894,16 +905,12 @@ function dateToDayProps(date: Date, key: number): DayProps {
     monthVisibility: MonthOnDayVisibility.HIDDEN,
     dayNumber: date.getDate(),
     monthColor: monthColor(monthFromDate(date)),
-    key,
+    settings,
   };
 }
 
-function datesToWeekProps(
-  dates: Date[],
-  settings: PlannerSettings,
-  key: number
-): WeekProps {
-  const dayProps = dates.map((date, index) => dateToDayProps(date, index));
+function datesToWeekProps(dates: Date[], settings: PlannerSettings): WeekProps {
+  const dayProps = dates.map((date, index) => dateToDayProps(date, settings));
   // set this so we get the same week numbering as Google Calendar
   const firstWeekContainsDate = 7;
   let weekStartsOn: 0 | 1 = 0;
@@ -915,7 +922,7 @@ function datesToWeekProps(
     weekStartsOn,
   });
   const weekLabel = monthColor(monthFromDate(dates[0]));
-  return { days: dayProps, weekNumber, weekLabel, key };
+  return { days: dayProps, weekNumber, weekLabel };
 }
 
 // Kind of hacky, would be more elegant if this
@@ -1002,6 +1009,7 @@ function settingsFromSyncedState(): PlannerSettings {
     "showSettings",
     "HIDE"
   );
+  // TODO: truncate this down to just the current day
   const today = new Date();
   const setters = {
     setTitle,
@@ -1034,8 +1042,8 @@ function Planner(): AutoLayout {
     weeks = weeks.map((week) => week.filter((day) => !isWeekend(day)));
   }
 
-  const weekProps = weeks.map((week, index) =>
-    datesToWeekProps(week, plannerSettings, index)
+  const weekProps = weeks.map((week) =>
+    datesToWeekProps(week, plannerSettings)
   );
   setMonthVisibility(weekProps);
 
