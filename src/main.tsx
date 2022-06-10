@@ -287,6 +287,7 @@ enum MonthOnDayVisibility {
 }
 
 type DayProps = {
+  date: Date;
   month: Month;
   monthVisibility: MonthOnDayVisibility;
   dayNumber: number;
@@ -379,28 +380,469 @@ function Day(props: DayProps) {
   );
 }
 
-function Settings() {
-  return <Frame name="Settings" fill="#FFF" width={100} height={100} />;
+function SettingsMenuOpenIcon(settings: PlannerSettings) {
+  const fill = settings.showSettings === "SHOW" ? "#E8E8E8" : "#fff";
+  return (
+    <Frame
+      name="Settings"
+      fill={fill}
+      stroke="#B6B6B6"
+      width={100}
+      height={100}
+      overflow="visible"
+      onClick={() => {
+        settings.setters.setShowSettings(
+          settings.showSettings === "HIDE" ? "SHOW" : "HIDE"
+        );
+      }}
+    >
+      <SVG
+        name="Icon"
+        x={{
+          type: "horizontal-scale",
+          leftOffsetPercent: 33.084,
+          rightOffsetPercent: 33.083,
+        }}
+        y={{
+          type: "vertical-scale",
+          topOffsetPercent: 28.25,
+          bottomOffsetPercent: 28.25,
+        }}
+        height={100}
+        width={100}
+        overflow="visible"
+        src='<svg width="38" height="48" viewBox="0 0 38 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.33398 45.75L9.33399 16.75M9.33399 16.75C13.3381 16.75 16.584 13.5041 16.584 9.5C16.584 5.49593 13.338 2.25 9.33398 2.25C5.32992 2.25 2.08398 5.49594 2.08398 9.5C2.08398 13.5041 5.32992 16.75 9.33399 16.75ZM28.6673 31.25L28.6673 2.25M28.6673 31.25C32.6714 31.25 35.9173 34.4959 35.9173 38.5C35.9173 42.5041 32.6714 45.75 28.6673 45.75C24.6633 45.75 21.4173 42.5041 21.4173 38.5C21.4173 34.4959 24.6633 31.25 28.6673 31.25Z" stroke="#7D7D7D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        '
+      />
+    </Frame>
+  );
 }
 
-function DayLabels() {
+function SettingsMenuFloating(settings: PlannerSettings): Frame {
   return (
-    <AutoLayout
-      name="Day Labels"
-      overflow="visible"
-      horizontalAlignItems="center"
-      verticalAlignItems="center"
+    <Frame
+      name="SettingsMenu"
+      effect={[
+        {
+          type: "drop-shadow",
+          color: "#00000002",
+          offset: {
+            x: 0,
+            y: 3.435,
+          },
+          blur: 2.748,
+        },
+        {
+          type: "drop-shadow",
+          color: "#00000003",
+          offset: {
+            x: 0,
+            y: 8.687,
+          },
+          blur: 6.95,
+        },
+        {
+          type: "drop-shadow",
+          color: "#00000004",
+          offset: {
+            x: 0,
+            y: 17.721,
+          },
+          blur: 14.177,
+        },
+        {
+          type: "drop-shadow",
+          color: "#00000005",
+          offset: {
+            x: 0,
+            y: 36.502,
+          },
+          blur: 29.201,
+        },
+        {
+          type: "drop-shadow",
+          color: "#00000008",
+          offset: {
+            x: 0,
+            y: 100,
+          },
+          blur: 80,
+        },
+      ]}
+      fill="#FBFBFB"
+      stroke="#0006"
+      cornerRadius={6}
+      width={800}
+      height={900}
+      positioning="absolute"
+      x={-915}
+      y={0}
     >
-      <Settings />
-      <DayLabel dayOfWeek="Monday" />
-      <DayLabel dayOfWeek="Tuesday" />
-      <DayLabel dayOfWeek="Wednesday" />
-      <DayLabel dayOfWeek="Thursday" />
-      <DayLabel dayOfWeek="Friday" />
-      <DayLabel dayOfWeek="Saturday" />
-      <DayLabel dayOfWeek="Sunday" />
-    </AutoLayout>
+      <AutoLayout
+        name="Menu"
+        y={140}
+        overflow="visible"
+        direction="vertical"
+        spacing={10}
+      >
+        <Frame name="Spacer" width={798} height={20} />
+        <AutoLayout
+          name="MenuRow"
+          overflow="visible"
+          spacing={50}
+          padding={{
+            vertical: 0,
+            horizontal: 44,
+          }}
+          width={800}
+          height={80}
+          verticalAlignItems="center"
+        >
+          <SVG
+            name="RefreshIcon"
+            height={30}
+            width={32}
+            src='<svg width="36" height="34" viewBox="0 0 36 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 13.6667C2 13.6667 5.34164 9.1137 8.05639 6.39707C10.7711 3.68045 14.5227 2 18.6667 2C26.9509 2 33.6667 8.71573 33.6667 17C33.6667 25.2843 26.9509 32 18.6667 32C11.8282 32 6.05852 27.4238 4.25294 21.1667M2 13.6667V3.66667M2 13.6667H12" stroke="#7D7D7D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            '
+          />
+          <Text
+            name="Refresh"
+            fill="#7D7D7D"
+            verticalAlignText="center"
+            lineHeight={60}
+            fontFamily="Inter"
+            fontSize={32}
+            letterSpacing={0.32}
+            fontWeight={500}
+          >
+            Refresh
+          </Text>
+        </AutoLayout>
+        <AutoLayout
+          name="MenuRow"
+          overflow="visible"
+          spacing={50}
+          padding={{
+            vertical: 0,
+            horizontal: 44,
+          }}
+          width={800}
+          height={80}
+          verticalAlignItems="center"
+        >
+          <SVG
+            name="JumpIcon"
+            opacity={0.3}
+            height={32}
+            width={33}
+            src='<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.3" d="M25.3333 19.4577C31.2197 20.6151 35.3333 23.2582 35.3333 26.3337C35.3333 30.4758 27.8714 33.8337 18.6667 33.8337C9.46192 33.8337 2 30.4758 2 26.3337C2 23.2582 6.11365 20.6151 12 19.4577M18.6667 25.5003V12.167M18.6667 12.167C21.4281 12.167 23.6667 9.92842 23.6667 7.16699C23.6667 4.40557 21.4281 2.16699 18.6667 2.16699C15.9052 2.16699 13.6667 4.40557 13.6667 7.16699C13.6667 9.92842 15.9052 12.167 18.6667 12.167Z" stroke="#7D7D7D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            '
+          />
+          <Text
+            name="Jump to today"
+            opacity={0.2}
+            fill="#7D7D7D"
+            verticalAlignText="center"
+            lineHeight={60}
+            fontFamily="Inter"
+            fontSize={32}
+            letterSpacing={0.32}
+            fontWeight={500}
+          >
+            Jump to today
+          </Text>
+        </AutoLayout>
+        <Frame name="Spacer" width={798} height={30}>
+          <SVG
+            name="Divider"
+            opacity={0.1}
+            x={{
+              type: "center",
+              offset: 0,
+            }}
+            y={{
+              type: "center",
+              offset: 0,
+            }}
+            width={798}
+            height={1}
+            src="<svg width='798' viewBox='0 0 798 1' fill='none' xmlns='http://www.w3.org/2000/svg'>
+<path opacity='1' d='M0 0H798' stroke='black' stroke-width='2'/>
+</svg>
+"
+          />
+        </Frame>
+        <AutoLayout
+          name="MenuRow"
+          overflow="visible"
+          spacing={50}
+          padding={{
+            vertical: 0,
+            horizontal: 44,
+          }}
+          width={800}
+          height={80}
+          verticalAlignItems="center"
+          onClick={() => {
+            settings.setters.setWeekView("MONDAY_START_WITH_WEEKENDS");
+          }}
+        >
+          <SVG
+            name="CheckIcon"
+            height={18}
+            width={27}
+            src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="#7D7D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            '
+          />
+          <Text
+            name="Full week, starts Sunday"
+            fill="#7D7D7D"
+            verticalAlignText="center"
+            lineHeight={60}
+            fontFamily="Inter"
+            fontSize={32}
+            letterSpacing={0.32}
+            fontWeight={700}
+          >
+            Full week, starts Sunday
+          </Text>
+        </AutoLayout>
+        <AutoLayout
+          name="MenuRow"
+          overflow="visible"
+          spacing={50}
+          padding={{
+            vertical: 0,
+            horizontal: 44,
+          }}
+          width={800}
+          height={80}
+          verticalAlignItems="center"
+          onClick={() => {
+            settings.setters.setWeekView("MONDAY_START_WITH_WEEKENDS");
+          }}
+        >
+          <SVG
+            name="CheckIcon"
+            height={18}
+            width={27}
+            src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="#7D7D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            '
+          />
+          <Text
+            name="Full week, starts Monday"
+            fill="#7D7D7D"
+            verticalAlignText="center"
+            lineHeight={60}
+            fontFamily="Inter"
+            fontSize={32}
+            letterSpacing={0.32}
+            fontWeight={500}
+          >
+            Full week, starts Monday
+          </Text>
+        </AutoLayout>
+        <AutoLayout
+          name="MenuRow"
+          overflow="visible"
+          spacing={50}
+          padding={{
+            vertical: 0,
+            horizontal: 44,
+          }}
+          width={800}
+          height={80}
+          verticalAlignItems="center"
+          onClick={() => {
+            settings.setters.setWeekView("MONDAY_START_WITHOUT_WEEKENDS");
+          }}
+        >
+          <SVG
+            name="CheckIcon"
+            height={18}
+            width={27}
+            src="<svg width='27' height='20' viewBox='0 0 27 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+<path d='M26.6667 0.833008L8.33333 19.1663L0 10.833' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/>
+</svg>
+"
+          />
+          <Text
+            name="Weekdays only"
+            fill="#7D7D7D"
+            verticalAlignText="center"
+            lineHeight={60}
+            fontFamily="Inter"
+            fontSize={32}
+            letterSpacing={0.32}
+            fontWeight={500}
+          >
+            Weekdays only
+          </Text>
+        </AutoLayout>
+        <Frame name="Spacer" width={798} height={20} />
+      </AutoLayout>
+      <SVG
+        name="Divider"
+        opacity={0.1}
+        x={2}
+        y={140}
+        width={798}
+        height={1}
+        src="<svg width='798' viewBox='0 0 798 1' fill='none' xmlns='http://www.w3.org/2000/svg'>
+<path opacity='1' d='M0 0H798' stroke='black' stroke-width='2'/>
+</svg>
+"
+      />
+      <AutoLayout
+        name="SizeSelector"
+        x={588}
+        y={42}
+        overflow="visible"
+        spacing={50}
+        verticalAlignItems="center"
+      >
+        <Rectangle
+          name="Selected"
+          x={-10}
+          y={-10}
+          positioning="absolute"
+          stroke="#7D7D7D"
+          cornerRadius={3}
+          strokeWidth={3}
+          width={80}
+          height={80}
+        />
+        <Rectangle
+          name="Square"
+          fill="#FFF"
+          stroke="#0003"
+          cornerRadius={3}
+          width={60}
+          height={60}
+        />
+        <Rectangle
+          name="Rectangular"
+          fill="#FFF"
+          stroke="#0003"
+          cornerRadius={3}
+          width={60}
+          height={40}
+        />
+      </AutoLayout>
+      <SVG
+        name="Divider"
+        opacity={0.1}
+        x={538}
+        height={140}
+        width={1}
+        src="<svg height='140' viewBox='0 0 1 140' fill='none' xmlns='http://www.w3.org/2000/svg'>
+<path opacity='1' d='M0 140L-6.1196e-06 -2.08616e-06' stroke='black' stroke-width='2'/>
+</svg>
+"
+      />
+      <AutoLayout
+        name="ColorSelector"
+        x={36}
+        y={46}
+        overflow="visible"
+        spacing={32}
+        verticalAlignItems="center"
+      >
+        <Ellipse
+          name="Selected"
+          x={-10}
+          y={-10}
+          positioning="absolute"
+          stroke="#7D7D7D"
+          strokeWidth={3}
+          width={70}
+          height={70}
+        />
+        <Ellipse
+          name="White"
+          fill="#FFF"
+          stroke="#0003"
+          width={50}
+          height={50}
+        />
+        <Ellipse name="Black" fill="#383838" width={50} height={50} />
+        <Ellipse name="Yellow" fill="#FDBE00" width={50} height={50} />
+        <Ellipse name="Green" fill="#009051" width={50} height={50} />
+        <Ellipse name="Blue" fill="#008FEA" width={50} height={50} />
+        <Ellipse name="Purple" fill="#923BF6" width={50} height={50} />
+      </AutoLayout>
+    </Frame>
   );
+}
+
+function DayLabels(settings: PlannerSettings) {
+  if (settings.weekView === "SUNDAY_START") {
+    return (
+      <AutoLayout
+        name="Day Labels"
+        overflow="visible"
+        horizontalAlignItems="center"
+        verticalAlignItems="center"
+      >
+        {SettingsMenuOpenIcon(settings)}
+        <DayLabel dayOfWeek="Sunday" />
+        <DayLabel dayOfWeek="Monday" />
+        <DayLabel dayOfWeek="Tuesday" />
+        <DayLabel dayOfWeek="Wednesday" />
+        <DayLabel dayOfWeek="Thursday" />
+        <DayLabel dayOfWeek="Friday" />
+        <DayLabel dayOfWeek="Saturday" />
+      </AutoLayout>
+    );
+  } else {
+    if (settings.weekView === "MONDAY_START_WITH_WEEKENDS") {
+      return (
+        <AutoLayout
+          name="Day Labels"
+          overflow="visible"
+          horizontalAlignItems="center"
+          verticalAlignItems="center"
+        >
+          {SettingsMenuOpenIcon(settings)}
+          <DayLabel dayOfWeek="Monday" />
+          <DayLabel dayOfWeek="Tuesday" />
+          <DayLabel dayOfWeek="Wednesday" />
+          <DayLabel dayOfWeek="Thursday" />
+          <DayLabel dayOfWeek="Friday" />
+          <DayLabel dayOfWeek="Saturday" />
+          <DayLabel dayOfWeek="Sunday" />
+        </AutoLayout>
+      );
+    } else {
+      if (settings.weekView === "MONDAY_START_WITHOUT_WEEKENDS") {
+        return (
+          <AutoLayout
+            name="Day Labels"
+            overflow="visible"
+            horizontalAlignItems="center"
+            verticalAlignItems="center"
+          >
+            {SettingsMenuOpenIcon(settings)}
+            <DayLabel dayOfWeek="Monday" />
+            <DayLabel dayOfWeek="Tuesday" />
+            <DayLabel dayOfWeek="Wednesday" />
+            <DayLabel dayOfWeek="Thursday" />
+            <DayLabel dayOfWeek="Friday" />
+          </AutoLayout>
+        );
+      }
+    }
+  }
 }
 
 type WeekProps = {
@@ -429,11 +871,11 @@ function Week(props: WeekProps): AutoLayout {
 }
 
 type WeeklyCalendarProps = {
-  title: string;
+  plannerSettings: PlannerSettings;
   weeks: WeekProps[];
 };
 
-function Title(title: string) {
+function Title(settings: PlannerSettings) {
   return (
     <Input
       name="Title"
@@ -447,10 +889,9 @@ function Title(title: string) {
       x={0}
       y={-285}
       placeholder="12-week planner"
-      value={title}
+      value={settings.title}
       onTextEditEnd={(event) => {
-        const [_title, setTitle] = useSyncedState(title, "");
-        setTitle(event.characters);
+        settings.setters.setTitle(event.characters);
       }}
       width={2900}
       horizontalAlignText="left"
@@ -459,6 +900,11 @@ function Title(title: string) {
 }
 
 function WeeklyCalendar(props: WeeklyCalendarProps) {
+  console.log(`Settings are: ${JSON.stringify(props.plannerSettings)}`);
+  let maybeFloatingSettings: Frame | null = null;
+  if (props.plannerSettings.showSettings === "SHOW") {
+    maybeFloatingSettings = SettingsMenuFloating(props.plannerSettings);
+  }
   return (
     <AutoLayout
       name="Calendar"
@@ -466,8 +912,9 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
       horizontalAlignItems="center"
       overflow="visible"
     >
-      {Title(props.title)}
-      {DayLabels()}
+      {maybeFloatingSettings}
+      {Title(props.plannerSettings)}
+      {DayLabels(props.plannerSettings)}
       {props.weeks.map((week) => Week(week))}
     </AutoLayout>
   );
@@ -476,6 +923,7 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
 function dateToDayProps(date: Date, key: number): DayProps {
   const month = monthFromDate(date);
   return {
+    date,
     month,
     monthVisibility: MonthOnDayVisibility.HIDDEN,
     dayNumber: date.getDate(),
@@ -484,12 +932,22 @@ function dateToDayProps(date: Date, key: number): DayProps {
   };
 }
 
-function datesToWeekProps(dates: Date[], key: number): WeekProps {
+function datesToWeekProps(
+  dates: Date[],
+  settings: PlannerSettings,
+  key: number
+): WeekProps {
   const dayProps = dates.map((date, index) => dateToDayProps(date, index));
   // set this so we get the same week numbering as Google Calendar
   const firstWeekContainsDate = 7;
-  // TODO: pass in option for start of week here
-  const weekNumber = getWeek(dates[0], { firstWeekContainsDate });
+  let weekStartsOn: 0 | 1 = 0;
+  if (settings.weekView === "SUNDAY_START") {
+    weekStartsOn = 1;
+  }
+  const weekNumber = getWeek(dates[0], {
+    firstWeekContainsDate,
+    weekStartsOn,
+  });
   const weekLabel = monthColor(monthFromDate(dates[0]));
   return { days: dayProps, weekNumber, weekLabel, key };
 }
@@ -510,12 +968,108 @@ function setMonthVisibility(weeks: WeekProps[]): void {
   }
 }
 
+type PlannerSize = "SMALL" | "LARGE";
+
+function plannerSizeFromString(size: string): PlannerSize {
+  switch (size) {
+    case "SMALL":
+      return "SMALL";
+    case "LARGE":
+      return "LARGE";
+    default:
+      return "LARGE";
+  }
+}
+
+type ShowSettings = "SHOW" | "HIDE";
+
+function showSettingsFromString(show: string): ShowSettings {
+  switch (show) {
+    case "SHOW":
+      return "SHOW";
+    case "HIDE":
+      return "HIDE";
+    default:
+      return "HIDE";
+  }
+}
+
+type WeekView =
+  | "SUNDAY_START"
+  | "MONDAY_START_WITH_WEEKENDS"
+  | "MONDAY_START_WITHOUT_WEEKENDS";
+
+type PlannerSettings = {
+  title: string;
+  weekView: WeekView;
+  size: PlannerSize;
+  currentDay: Date;
+  showSettings: ShowSettings;
+  setters: SyncStateSetters;
+};
+
+type SyncStateSetters = {
+  setTitle: (value: string) => void;
+  setWeekView: (value: WeekView) => void;
+  setSize: (value: PlannerSize) => void;
+  setShowSettings: (value: ShowSettings) => void;
+};
+
+function weekViewFromString(weekView: string): WeekView {
+  switch (weekView) {
+    case "SUNDAY_START":
+      return "SUNDAY_START";
+    case "MONDAY_START_WITH_WEEKENDS":
+      return "MONDAY_START_WITH_WEEKENDS";
+    case "MONDAY_START_WITHOUT_WEEKENDS":
+      return "MONDAY_START_WITHOUT_WEEKENDS";
+    default:
+      return "SUNDAY_START";
+  }
+}
+
+function settingsFromSyncedState(): PlannerSettings {
+  const [title, setTitle] = useSyncedState("title", "");
+  const [weekView, setWeekView] = useSyncedState("weekView", "SUNDAY_START");
+  const [size, setSize] = useSyncedState("size", "LARGE");
+  const [showSettings, setShowSettings] = useSyncedState(
+    "showSettings",
+    "HIDE"
+  );
+  const today = new Date();
+  const setters = {
+    setTitle,
+    setWeekView,
+    setSize,
+    setShowSettings,
+  };
+  return {
+    title,
+    weekView: weekViewFromString(weekView),
+    size: plannerSizeFromString(size),
+    currentDay: today,
+    showSettings: showSettingsFromString(showSettings),
+    setters,
+  };
+}
+
 function Planner(): AutoLayout {
-  const [title, _setTitle] = useSyncedState("title", "");
-  const weeks = nWeeksFromDate(new Date(), 12);
-  const weekProps = weeks.map((week, index) => datesToWeekProps(week, index));
+  const plannerSettings = settingsFromSyncedState();
+  let weekStartsOn: 0 | 1 = 0;
+  if (plannerSettings.weekView == "SUNDAY_START") {
+    weekStartsOn = 1;
+  }
+  const weeks = nWeeksFromDate(plannerSettings.currentDay, weekStartsOn, 12);
+  const weekProps = weeks.map((week, index) =>
+    datesToWeekProps(week, plannerSettings, index)
+  );
   setMonthVisibility(weekProps);
-  return WeeklyCalendar({ weeks: weekProps, title });
+
+  const [_showSettings, setShowSettings] = useSyncedState(
+    "showSettings",
+    "HIDE"
+  );
+  return WeeklyCalendar({ weeks: weekProps, plannerSettings });
 }
 
 widget.register(Planner);
