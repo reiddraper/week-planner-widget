@@ -11,7 +11,7 @@ const {
   useSyncedState,
 } = widget;
 
-import { getWeek } from "date-fns";
+import { getWeek, isWeekend } from "date-fns";
 import { nWeeksFromDate } from "./date";
 
 enum MonthColor {
@@ -225,13 +225,14 @@ type DayLabelProps = {
   dayOfWeek: string;
 } & Partial<FrameProps>;
 
-function DayLabel(props: DayLabelProps) {
+function DayLabel(props: DayLabelProps): Frame {
   return (
     <Frame
       name="DayLabel100X400"
       overflow="visible"
       width={400}
       height={100}
+      key={props.dayOfWeek}
       {...props}
     >
       <Rectangle
@@ -420,6 +421,75 @@ function SettingsMenuOpenIcon(settings: PlannerSettings) {
   );
 }
 
+function CheckIcon(checked: boolean): SVG {
+  if (checked) {
+    return (
+      <SVG
+        name="CheckIcon"
+        height={18}
+        width={27}
+        src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="#7D7D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            '
+      />
+    );
+  } else {
+    return (
+      <SVG
+        name="CheckIcon"
+        height={18}
+        width={27}
+        src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            '
+      />
+    );
+  }
+}
+
+type WeekViewSettingOptionsProps = {
+  settings: PlannerSettings;
+  settingText: string;
+  settingOnClick: WeekView;
+};
+
+function WeekViewSettingOptions(props: WeekViewSettingOptionsProps): Frame {
+  const selected = props.settings.weekView === props.settingOnClick;
+  return (
+    <AutoLayout
+      name="MenuRow"
+      overflow="visible"
+      spacing={50}
+      padding={{
+        vertical: 0,
+        horizontal: 44,
+      }}
+      width={800}
+      height={80}
+      verticalAlignItems="center"
+      onClick={() => {
+        props.settings.setters.setWeekView(props.settingOnClick);
+      }}
+    >
+      {CheckIcon(selected)}
+      <Text
+        name={props.settingText}
+        fill="#7D7D7D"
+        verticalAlignText="center"
+        lineHeight={60}
+        fontFamily="Inter"
+        fontSize={32}
+        letterSpacing={0.32}
+        fontWeight={selected ? 700 : 500}
+      >
+        {props.settingText}
+      </Text>
+    </AutoLayout>
+  );
+}
+
 function SettingsMenuFloating(settings: PlannerSettings): Frame {
   return (
     <Frame
@@ -578,117 +648,21 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
 "
           />
         </Frame>
-        <AutoLayout
-          name="MenuRow"
-          overflow="visible"
-          spacing={50}
-          padding={{
-            vertical: 0,
-            horizontal: 44,
-          }}
-          width={800}
-          height={80}
-          verticalAlignItems="center"
-          onClick={() => {
-            settings.setters.setWeekView("MONDAY_START_WITH_WEEKENDS");
-          }}
-        >
-          <SVG
-            name="CheckIcon"
-            height={18}
-            width={27}
-            src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="#7D7D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            '
-          />
-          <Text
-            name="Full week, starts Sunday"
-            fill="#7D7D7D"
-            verticalAlignText="center"
-            lineHeight={60}
-            fontFamily="Inter"
-            fontSize={32}
-            letterSpacing={0.32}
-            fontWeight={700}
-          >
-            Full week, starts Sunday
-          </Text>
-        </AutoLayout>
-        <AutoLayout
-          name="MenuRow"
-          overflow="visible"
-          spacing={50}
-          padding={{
-            vertical: 0,
-            horizontal: 44,
-          }}
-          width={800}
-          height={80}
-          verticalAlignItems="center"
-          onClick={() => {
-            settings.setters.setWeekView("MONDAY_START_WITH_WEEKENDS");
-          }}
-        >
-          <SVG
-            name="CheckIcon"
-            height={18}
-            width={27}
-            src='<svg width="31" height="24" viewBox="0 0 31 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M28.6667 2.83301L10.3333 21.1663L2 12.833" stroke="#7D7D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            '
-          />
-          <Text
-            name="Full week, starts Monday"
-            fill="#7D7D7D"
-            verticalAlignText="center"
-            lineHeight={60}
-            fontFamily="Inter"
-            fontSize={32}
-            letterSpacing={0.32}
-            fontWeight={500}
-          >
-            Full week, starts Monday
-          </Text>
-        </AutoLayout>
-        <AutoLayout
-          name="MenuRow"
-          overflow="visible"
-          spacing={50}
-          padding={{
-            vertical: 0,
-            horizontal: 44,
-          }}
-          width={800}
-          height={80}
-          verticalAlignItems="center"
-          onClick={() => {
-            settings.setters.setWeekView("MONDAY_START_WITHOUT_WEEKENDS");
-          }}
-        >
-          <SVG
-            name="CheckIcon"
-            height={18}
-            width={27}
-            src="<svg width='27' height='20' viewBox='0 0 27 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
-<path d='M26.6667 0.833008L8.33333 19.1663L0 10.833' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/>
-</svg>
-"
-          />
-          <Text
-            name="Weekdays only"
-            fill="#7D7D7D"
-            verticalAlignText="center"
-            lineHeight={60}
-            fontFamily="Inter"
-            fontSize={32}
-            letterSpacing={0.32}
-            fontWeight={500}
-          >
-            Weekdays only
-          </Text>
-        </AutoLayout>
+        {WeekViewSettingOptions({
+          settings,
+          settingText: "Full week, starts Sunday",
+          settingOnClick: "SUNDAY_START",
+        })}
+        {WeekViewSettingOptions({
+          settings,
+          settingText: "Full week, starts Monday",
+          settingOnClick: "MONDAY_START_WITH_WEEKENDS",
+        })}
+        {WeekViewSettingOptions({
+          settings,
+          settingText: "Weekdays only",
+          settingOnClick: "MONDAY_START_WITHOUT_WEEKENDS",
+        })}
         <Frame name="Spacer" width={798} height={20} />
       </AutoLayout>
       <SVG
@@ -785,64 +759,58 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
   );
 }
 
+const sundayStart = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const mondayStartWithWeekends = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+const mondayStartWithoutWeekends = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+];
+
 function DayLabels(settings: PlannerSettings) {
-  if (settings.weekView === "SUNDAY_START") {
-    return (
-      <AutoLayout
-        name="Day Labels"
-        overflow="visible"
-        horizontalAlignItems="center"
-        verticalAlignItems="center"
-      >
-        {SettingsMenuOpenIcon(settings)}
-        <DayLabel dayOfWeek="Sunday" />
-        <DayLabel dayOfWeek="Monday" />
-        <DayLabel dayOfWeek="Tuesday" />
-        <DayLabel dayOfWeek="Wednesday" />
-        <DayLabel dayOfWeek="Thursday" />
-        <DayLabel dayOfWeek="Friday" />
-        <DayLabel dayOfWeek="Saturday" />
-      </AutoLayout>
-    );
-  } else {
-    if (settings.weekView === "MONDAY_START_WITH_WEEKENDS") {
-      return (
-        <AutoLayout
-          name="Day Labels"
-          overflow="visible"
-          horizontalAlignItems="center"
-          verticalAlignItems="center"
-        >
-          {SettingsMenuOpenIcon(settings)}
-          <DayLabel dayOfWeek="Monday" />
-          <DayLabel dayOfWeek="Tuesday" />
-          <DayLabel dayOfWeek="Wednesday" />
-          <DayLabel dayOfWeek="Thursday" />
-          <DayLabel dayOfWeek="Friday" />
-          <DayLabel dayOfWeek="Saturday" />
-          <DayLabel dayOfWeek="Sunday" />
-        </AutoLayout>
+  let days: Frame[] = [];
+  switch (settings.weekView) {
+    case "SUNDAY_START":
+      days = sundayStart.map((day) => DayLabel({ dayOfWeek: day }));
+      break;
+    case "MONDAY_START_WITH_WEEKENDS":
+      days = mondayStartWithWeekends.map((day) => DayLabel({ dayOfWeek: day }));
+      break;
+    case "MONDAY_START_WITHOUT_WEEKENDS":
+      days = mondayStartWithoutWeekends.map((day) =>
+        DayLabel({ dayOfWeek: day })
       );
-    } else {
-      if (settings.weekView === "MONDAY_START_WITHOUT_WEEKENDS") {
-        return (
-          <AutoLayout
-            name="Day Labels"
-            overflow="visible"
-            horizontalAlignItems="center"
-            verticalAlignItems="center"
-          >
-            {SettingsMenuOpenIcon(settings)}
-            <DayLabel dayOfWeek="Monday" />
-            <DayLabel dayOfWeek="Tuesday" />
-            <DayLabel dayOfWeek="Wednesday" />
-            <DayLabel dayOfWeek="Thursday" />
-            <DayLabel dayOfWeek="Friday" />
-          </AutoLayout>
-        );
-      }
-    }
+      break;
   }
+  return (
+    <AutoLayout
+      name="Day Labels"
+      overflow="visible"
+      horizontalAlignItems="center"
+      verticalAlignItems="center"
+    >
+      {SettingsMenuOpenIcon(settings)}
+      {days}
+    </AutoLayout>
+  );
 }
 
 type WeekProps = {
@@ -860,8 +828,6 @@ function Week(props: WeekProps): AutoLayout {
       y={100}
       strokeWidth={0}
       overflow="visible"
-      width={2900}
-      height={400}
       key={props.key}
     >
       {weekLabel(props.weekNumber, props.weekLabel)}
@@ -1055,11 +1021,19 @@ function settingsFromSyncedState(): PlannerSettings {
 
 function Planner(): AutoLayout {
   const plannerSettings = settingsFromSyncedState();
+
   let weekStartsOn: 0 | 1 = 0;
   if (plannerSettings.weekView == "SUNDAY_START") {
     weekStartsOn = 1;
   }
-  const weeks = nWeeksFromDate(plannerSettings.currentDay, weekStartsOn, 12);
+
+  let weeks = nWeeksFromDate(plannerSettings.currentDay, weekStartsOn, 12);
+
+  // If only showing weekdays, filter out weekends
+  if (plannerSettings.weekView === "MONDAY_START_WITHOUT_WEEKENDS") {
+    weeks = weeks.map((week) => week.filter((day) => !isWeekend(day)));
+  }
+
   const weekProps = weeks.map((week, index) =>
     datesToWeekProps(week, plannerSettings, index)
   );
