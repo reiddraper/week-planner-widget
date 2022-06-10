@@ -581,6 +581,9 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
           width={800}
           height={80}
           verticalAlignItems="center"
+          onClick={() => {
+            settings.setters.setCurrentDay(new Date());
+          }}
         >
           <SVG
             name="RefreshIcon"
@@ -615,20 +618,21 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
           width={800}
           height={80}
           verticalAlignItems="center"
+          onClick={() => {
+            settings.setters.setInitialDay(new Date());
+          }}
         >
           <SVG
             name="JumpIcon"
-            opacity={0.3}
             height={32}
             width={33}
             src='<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path opacity="0.3" d="M25.3333 19.4577C31.2197 20.6151 35.3333 23.2582 35.3333 26.3337C35.3333 30.4758 27.8714 33.8337 18.6667 33.8337C9.46192 33.8337 2 30.4758 2 26.3337C2 23.2582 6.11365 20.6151 12 19.4577M18.6667 25.5003V12.167M18.6667 12.167C21.4281 12.167 23.6667 9.92842 23.6667 7.16699C23.6667 4.40557 21.4281 2.16699 18.6667 2.16699C15.9052 2.16699 13.6667 4.40557 13.6667 7.16699C13.6667 9.92842 15.9052 12.167 18.6667 12.167Z" stroke="#7D7D7D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path opacity="1" d="M25.3333 19.4577C31.2197 20.6151 35.3333 23.2582 35.3333 26.3337C35.3333 30.4758 27.8714 33.8337 18.6667 33.8337C9.46192 33.8337 2 30.4758 2 26.3337C2 23.2582 6.11365 20.6151 12 19.4577M18.6667 25.5003V12.167M18.6667 12.167C21.4281 12.167 23.6667 9.92842 23.6667 7.16699C23.6667 4.40557 21.4281 2.16699 18.6667 2.16699C15.9052 2.16699 13.6667 4.40557 13.6667 7.16699C13.6667 9.92842 15.9052 12.167 18.6667 12.167Z" stroke="#7D7D7D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             '
           />
           <Text
             name="Jump to today"
-            opacity={0.2}
             fill="#7D7D7D"
             verticalAlignText="center"
             lineHeight={60}
@@ -877,7 +881,6 @@ function Title(settings: PlannerSettings) {
 }
 
 function WeeklyCalendar(props: WeeklyCalendarProps) {
-  console.log(`Settings are: ${JSON.stringify(props.plannerSettings)}`);
   let maybeFloatingSettings: Frame | null = null;
   if (props.plannerSettings.showSettings === "SHOW") {
     maybeFloatingSettings = SettingsMenuFloating(props.plannerSettings);
@@ -977,6 +980,7 @@ type PlannerSettings = {
   weekView: WeekView;
   size: PlannerSize;
   currentDay: Date;
+  initialDay: Date;
   showSettings: ShowSettings;
   setters: SyncStateSetters;
 };
@@ -986,6 +990,8 @@ type SyncStateSetters = {
   setWeekView: (value: WeekView) => void;
   setSize: (value: PlannerSize) => void;
   setShowSettings: (value: ShowSettings) => void;
+  setCurrentDay: (value: Date) => void;
+  setInitialDay: (value: Date) => void;
 };
 
 function weekViewFromString(weekView: string): WeekView {
@@ -1002,6 +1008,23 @@ function weekViewFromString(weekView: string): WeekView {
 }
 
 function settingsFromSyncedState(): PlannerSettings {
+  const todayFn = () => new Date().toJSON();
+  const [currentDayString, setCurrentDayFromString] = useSyncedState(
+    "currentDay",
+    todayFn
+  );
+  const currentDay = new Date(currentDayString);
+  console.log(`Current day is ${currentDay}`);
+  const setCurrentDay = (date: Date) => setCurrentDayFromString(date.toJSON());
+  const [initialDayString, setInitialDayDayFromString] = useSyncedState(
+    "initialDay",
+    todayFn
+  );
+  const initialDay = new Date(initialDayString);
+  console.log(`Initial day is ${initialDay}`);
+  const setInitialDay = (date: Date) =>
+    setInitialDayDayFromString(date.toJSON());
+
   const [title, setTitle] = useSyncedState("title", "");
   const [weekView, setWeekView] = useSyncedState("weekView", "SUNDAY_START");
   const [size, setSize] = useSyncedState("size", "LARGE");
@@ -1009,19 +1032,20 @@ function settingsFromSyncedState(): PlannerSettings {
     "showSettings",
     "HIDE"
   );
-  // TODO: truncate this down to just the current day
-  const today = new Date();
   const setters = {
     setTitle,
     setWeekView,
     setSize,
     setShowSettings,
+    setCurrentDay,
+    setInitialDay,
   };
   return {
     title,
     weekView: weekViewFromString(weekView),
     size: plannerSizeFromString(size),
-    currentDay: today,
+    currentDay,
+    initialDay,
     showSettings: showSettingsFromString(showSettings),
     setters,
   };
@@ -1029,9 +1053,10 @@ function settingsFromSyncedState(): PlannerSettings {
 
 function Planner(): AutoLayout {
   const plannerSettings = settingsFromSyncedState();
+  console.log(`Settings are: ${JSON.stringify(plannerSettings)}`);
 
   let weekStartsOn: 0 | 1 = 0;
-  if (plannerSettings.weekView == "SUNDAY_START") {
+  if (plannerSettings.weekView !== "SUNDAY_START") {
     weekStartsOn = 1;
   }
 
