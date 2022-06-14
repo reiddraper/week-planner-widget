@@ -469,6 +469,7 @@ type WeekViewSettingOptionsProps = {
 
 function WeekViewSettingOptions(props: WeekViewSettingOptionsProps): Frame {
   const selected = props.settings.weekView === props.settingOnClick;
+  const hoverStyle = !selected ? { fill: "#2d2d2d" } : {};
   return (
     <AutoLayout
       name="MenuRow"
@@ -489,6 +490,7 @@ function WeekViewSettingOptions(props: WeekViewSettingOptionsProps): Frame {
       <Text
         name={props.settingText}
         fill="#7D7D7D"
+        hoverStyle={hoverStyle}
         verticalAlignText="center"
         lineHeight={60}
         fontFamily="Inter"
@@ -597,6 +599,9 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
           <Text
             name="Refresh"
             fill="#7D7D7D"
+            hoverStyle={{
+              fill: "#2d2d2d",
+            }}
             verticalAlignText="center"
             lineHeight={60}
             fontFamily="Inter"
@@ -640,6 +645,9 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
             fontSize={32}
             letterSpacing={0.32}
             fontWeight={500}
+            hoverStyle={{
+              fill: "#2d2d2d",
+            }}
           >
             Jump to today
           </Text>
@@ -1060,7 +1068,7 @@ function Planner(): AutoLayout {
     weekStartsOn = 1;
   }
 
-  let weeks = nWeeksFromDate(plannerSettings.currentDay, weekStartsOn, 12);
+  let weeks = nWeeksFromDate(plannerSettings.initialDay, weekStartsOn, 12);
 
   // If only showing weekdays, filter out weekends
   if (plannerSettings.weekView === "MONDAY_START_WITHOUT_WEEKENDS") {
