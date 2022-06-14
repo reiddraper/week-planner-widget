@@ -866,25 +866,263 @@ type WeeklyCalendarProps = {
 
 function Title(settings: PlannerSettings) {
   return (
-    <Input
+    <AutoLayout
       name="Title"
-      positioning="absolute"
-      fill="#000"
-      lineHeight="150%"
-      fontFamily="Inter"
-      fontSize={140}
-      letterSpacing={-5.632}
-      fontWeight={700}
-      x={0}
-      y={-285}
-      placeholder="12-week planner"
-      value={settings.title}
-      onTextEditEnd={(event) => {
-        settings.setters.setTitle(event.characters);
+      cornerRadius={{
+        topLeft: 24,
+        topRight: 0,
+        bottomRight: 20,
+        bottomLeft: 0,
       }}
-      width={2900}
-      horizontalAlignText="left"
-    ></Input>
+      overflow="visible"
+      verticalAlignItems="center"
+      width="fill-parent"
+      height={290}
+    >
+      <Input
+        name="12-week planner"
+        x={0.5}
+        y={24}
+        fill="#000000BF"
+        lineHeight="150%"
+        fontFamily="Inter"
+        fontSize={140}
+        letterSpacing={-5.88}
+        fontWeight={700}
+        placeholder="12-week planner"
+        width="fill-parent"
+        value={settings.title}
+        onTextEditEnd={(event) => {
+          settings.setters.setTitle(event.characters);
+        }}
+      ></Input>
+    </AutoLayout>
+  );
+}
+
+function Background(props: AutoLayoutProps): AutoLayout {
+  return (
+    <AutoLayout
+      name="Background"
+      effect={{
+        type: "inner-shadow",
+        color: "#FFFFFF59",
+        offset: {
+          x: 0,
+          y: 8,
+        },
+        blur: 6,
+      }}
+      fill="#C3EDCF"
+      stroke="#17391838"
+      cornerRadius={48}
+      strokeWidth={3}
+      overflow="visible"
+      direction="vertical"
+      spacing={10}
+      padding={56}
+      {...props}
+    />
+  );
+}
+
+function PunchHoleDarkProperty1Light(props: Partial<FrameProps>) {
+  return (
+    <Frame
+      name="PunchHoleDarkProperty1Light"
+      fill="#FFF"
+      overflow="visible"
+      width={100}
+      height={100}
+      {...props}
+    >
+      <Rectangle
+        name="Rectangle 7"
+        effect={{
+          type: "inner-shadow",
+          color: "#00000059",
+          offset: {
+            x: 0,
+            y: 4,
+          },
+          blur: 5,
+        }}
+        x={34}
+        y={34}
+        fill="#EDEDEDF2"
+        cornerRadius={6}
+        strokeWidth={1.512}
+        width={32}
+        height={32}
+      />
+      <Rectangle
+        name="Wire"
+        effect={{
+          type: "drop-shadow",
+          color: "#0000001F",
+          offset: {
+            x: 0,
+            y: 2,
+          },
+          blur: 4,
+          showShadowBehindNode: false,
+        }}
+        x={{
+          type: "center",
+          offset: 0,
+        }}
+        y={{
+          type: "top-bottom",
+          topOffset: -75,
+          bottomOffset: 49,
+        }}
+        fill={[
+          {
+            type: "solid",
+            color: {
+              r: 0.7749999761581421,
+              g: 0.7749999761581421,
+              b: 0.7749999761581421,
+              a: 1,
+            },
+          },
+          {
+            type: "gradient-linear",
+            gradientHandlePositions: [
+              {
+                x: 0.5,
+                y: 0.106,
+              },
+              {
+                x: 0.545,
+                y: 0.996,
+              },
+              {
+                x: 0.82,
+                y: 0.106,
+              },
+            ],
+            gradientStops: [
+              {
+                position: 0,
+                color: {
+                  r: 1,
+                  g: 1,
+                  b: 1,
+                  a: 0,
+                },
+              },
+              {
+                position: 0.3591432571411133,
+                color: {
+                  r: 1,
+                  g: 1,
+                  b: 1,
+                  a: 0.8500000238418579,
+                },
+              },
+              {
+                position: 1,
+                color: {
+                  r: 1,
+                  g: 1,
+                  b: 1,
+                  a: 0,
+                },
+              },
+            ],
+          },
+          {
+            type: "gradient-linear",
+            gradientHandlePositions: [
+              {
+                x: 0,
+                y: 0.512,
+              },
+              {
+                x: 1.045,
+                y: 0.512,
+              },
+              {
+                x: 0,
+                y: 0.508,
+              },
+            ],
+            gradientStops: [
+              {
+                position: 0,
+                color: {
+                  r: 1,
+                  g: 1,
+                  b: 1,
+                  a: 0,
+                },
+              },
+              {
+                position: 0.48705607652664185,
+                color: {
+                  r: 1,
+                  g: 1,
+                  b: 1,
+                  a: 0.7699999809265137,
+                },
+              },
+              {
+                position: 1,
+                color: {
+                  r: 1,
+                  g: 1,
+                  b: 1,
+                  a: 0,
+                },
+              },
+            ],
+          },
+        ]}
+        stroke="#0000001A"
+        cornerRadius={15}
+        width={14}
+        height={126}
+      />
+    </Frame>
+  );
+}
+
+function Holes() {
+  return (
+    <AutoLayout
+      name="Holes"
+      cornerRadius={{
+        topLeft: 24,
+        topRight: 0,
+        bottomRight: 20,
+        bottomLeft: 0,
+      }}
+      overflow="visible"
+      spacing="auto"
+      width={2895}
+      verticalAlignItems="center"
+    >
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+      <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
+    </AutoLayout>
   );
 }
 
@@ -894,17 +1132,60 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
     maybeFloatingSettings = SettingsMenuFloating(props.plannerSettings);
   }
   return (
-    <AutoLayout
-      name="Calendar"
-      direction="vertical"
-      horizontalAlignItems="center"
-      overflow="visible"
-    >
-      {maybeFloatingSettings}
-      {Title(props.plannerSettings)}
-      {DayLabels(props.plannerSettings)}
-      {props.weeks.map((week) => Week(week))}
-    </AutoLayout>
+    <Background>
+      <AutoLayout
+        name="Calendar"
+        direction="vertical"
+        horizontalAlignItems="center"
+        overflow="visible"
+        effect={[
+          {
+            type: "drop-shadow",
+            color: "#00000009",
+            offset: {
+              x: 0,
+              y: 0.798,
+            },
+            blur: 1.131,
+          },
+          {
+            type: "drop-shadow",
+            color: "#0000000E",
+            offset: {
+              x: 0,
+              y: 2.68,
+            },
+            blur: 3.797,
+          },
+          {
+            type: "drop-shadow",
+            color: "#00000017",
+            offset: {
+              x: 0,
+              y: 12,
+            },
+            blur: 17,
+          },
+        ]}
+        fill="#FFF"
+        stroke="#0000000D"
+        cornerRadius={19}
+        strokeWidth={2}
+        strokeAlign="outside"
+        padding={{
+          top: 0,
+          right: 80,
+          bottom: 80,
+          left: 80,
+        }}
+      >
+        {maybeFloatingSettings}
+        <Holes />
+        {Title(props.plannerSettings)}
+        {DayLabels(props.plannerSettings)}
+        {props.weeks.map((week) => Week(week))}
+      </AutoLayout>
+    </Background>
   );
 }
 
