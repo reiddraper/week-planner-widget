@@ -1179,9 +1179,9 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
           left: 80,
         }}
       >
-        {maybeFloatingSettings}
         <Holes />
         {Title(props.plannerSettings)}
+        {maybeFloatingSettings}
         {DayLabels(props.plannerSettings)}
         {props.weeks.map((week) => Week(week))}
       </AutoLayout>
