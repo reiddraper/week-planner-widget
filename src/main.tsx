@@ -1101,7 +1101,7 @@ function Holes() {
       }}
       overflow="visible"
       spacing="auto"
-      width="hug-contents"
+      width="fill-parent"
       verticalAlignItems="center"
     >
       <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
