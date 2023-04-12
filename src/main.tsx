@@ -508,6 +508,7 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
   return (
     <Frame
       name="SettingsMenu"
+      hidden={settings.showSettings === "HIDE"}
       effect={[
         {
           type: "drop-shadow",
@@ -1100,7 +1101,7 @@ function Holes() {
       }}
       overflow="visible"
       spacing="auto"
-      width={2895}
+      width="hug-contents"
       verticalAlignItems="center"
     >
       <PunchHoleDarkProperty1Light name="Punch-Hole-Dark" />
@@ -1127,10 +1128,7 @@ function Holes() {
 }
 
 function WeeklyCalendar(props: WeeklyCalendarProps) {
-  let maybeFloatingSettings: Frame | null = null;
-  if (props.plannerSettings.showSettings === "SHOW") {
-    maybeFloatingSettings = SettingsMenuFloating(props.plannerSettings);
-  }
+  const floatingSettings = SettingsMenuFloating(props.plannerSettings);
   return (
     <Background>
       <AutoLayout
@@ -1181,7 +1179,7 @@ function WeeklyCalendar(props: WeeklyCalendarProps) {
       >
         <Holes />
         {Title(props.plannerSettings)}
-        {maybeFloatingSettings}
+        {floatingSettings}
         {DayLabels(props.plannerSettings)}
         {props.weeks.map((week) => Week(week))}
       </AutoLayout>
