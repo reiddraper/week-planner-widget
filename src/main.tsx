@@ -767,53 +767,6 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
 "
       />
       <AutoLayout
-        name="SizeSelector"
-        x={588}
-        y={42}
-        overflow="visible"
-        spacing={50}
-        verticalAlignItems="center"
-      >
-        <Rectangle
-          name="Selected"
-          x={-10}
-          y={-10}
-          positioning="absolute"
-          stroke="#7D7D7D"
-          cornerRadius={3}
-          strokeWidth={3}
-          width={80}
-          height={80}
-        />
-        <Rectangle
-          name="Square"
-          fill="#FFF"
-          stroke="#0003"
-          cornerRadius={3}
-          width={60}
-          height={60}
-        />
-        <Rectangle
-          name="Rectangular"
-          fill="#FFF"
-          stroke="#0003"
-          cornerRadius={3}
-          width={60}
-          height={40}
-        />
-      </AutoLayout>
-      <SVG
-        name="Divider"
-        opacity={0.1}
-        x={538}
-        height={140}
-        width={1}
-        src="<svg height='140' viewBox='0 0 1 140' fill='none' xmlns='http://www.w3.org/2000/svg'>
-<path opacity='1' d='M0 140L-6.1196e-06 -2.08616e-06' stroke='black' stroke-width='2'/>
-</svg>
-"
-      />
-      <AutoLayout
         name="ColorSelector"
         x={36}
         y={46}
