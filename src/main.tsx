@@ -435,8 +435,9 @@ function SettingsMenuOpenIcon(settings: PlannerSettings) {
       name="Settings"
       fill={fill}
       stroke="#B6B6B6"
-      width={100}
-      height={100}
+      width={150}
+      height={150}
+      cornerRadius={130}
       overflow="visible"
       onClick={() => {
         settings.setters.setShowSettings(
@@ -830,6 +831,20 @@ const mondayStartWithoutWeekends = [
   "Friday",
 ];
 
+// NOTE: This is where the settings used to be
+function LeftCornerBumper() {
+  return (
+    <Frame
+      name="Settings"
+      fill="#FFF"
+      stroke="#B6B6B6"
+      width={100}
+      height={100}
+      overflow="visible"
+    ></Frame>
+  );
+}
+
 function DayLabels(settings: PlannerSettings) {
   let days: Frame[] = [];
   switch (settings.weekView) {
@@ -852,7 +867,7 @@ function DayLabels(settings: PlannerSettings) {
       horizontalAlignItems="center"
       verticalAlignItems="center"
     >
-      {SettingsMenuOpenIcon(settings)}
+      <LeftCornerBumper></LeftCornerBumper>
       {days}
     </AutoLayout>
   );
@@ -917,6 +932,7 @@ function Title(settings: PlannerSettings) {
           settings.setters.setTitle(event.characters);
         }}
       ></Input>
+      {SettingsMenuOpenIcon(settings)}
     </AutoLayout>
   );
 }
