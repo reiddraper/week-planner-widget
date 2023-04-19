@@ -24,12 +24,34 @@ type WeekLabelProps = {
   fillColor: string;
 };
 
+type ColorSelected = "SELECTED" | "NOT_SELECTED";
+
 function monthColorHex(monthColor: MonthColor): string {
   switch (monthColor) {
     case MonthColor.LIGHT:
       return "#fff";
     case MonthColor.HIGHLIGHT:
       return "#F5F5F5";
+  }
+}
+
+enum BackgroundColor {
+  MINT = "MINT",
+  PEACH = "PEACH",
+  DARK_NAVY = "DARK_NAVY",
+  GREY = "GREY",
+}
+
+function backgroundColorHex(backgroundColor: BackgroundColor): string {
+  switch (backgroundColor) {
+    case BackgroundColor.MINT:
+      return "#C3EDCF";
+    case BackgroundColor.PEACH:
+      return "#FBCFC5";
+    case BackgroundColor.DARK_NAVY:
+      return "#4B535A";
+    case BackgroundColor.GREY:
+      return "#C2C2C2";
   }
 }
 
@@ -504,6 +526,48 @@ function WeekViewSettingOptions(props: WeekViewSettingOptionsProps): Frame {
   );
 }
 
+function SelectedColorIndicator(selected: ColorSelected): Frame | null {
+  if (selected === "SELECTED") {
+    return (
+      <Ellipse
+        name="Selected"
+        x={-10}
+        y={-10}
+        stroke="#7D7D7D"
+        strokeWidth={3}
+        width={70}
+        height={70}
+      />
+    );
+  } else {
+    return null;
+  }
+}
+
+function ColorOption(
+  color: BackgroundColor,
+  selected: ColorSelected,
+  setTheme: (theme: BackgroundColor) => void
+): Frame {
+  return (
+    <Frame
+      name="Color"
+      overflow="visible"
+      width={50}
+      height={50}
+      onClick={() => setTheme(color)}
+    >
+      {SelectedColorIndicator(selected)}
+      <Ellipse
+        name={color}
+        fill={backgroundColorHex(color)}
+        width={50}
+        height={50}
+      />
+    </Frame>
+  );
+}
+
 function SettingsMenuFloating(settings: PlannerSettings): Frame {
   return (
     <Frame
@@ -757,28 +821,31 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
         spacing={32}
         verticalAlignItems="center"
       >
-        <Ellipse
-          name="Selected"
-          x={-10}
-          y={-10}
-          positioning="absolute"
-          stroke="#7D7D7D"
-          strokeWidth={3}
-          width={70}
-          height={70}
-        />
-        <Ellipse
-          name="White"
-          fill="#FFF"
-          stroke="#0003"
-          width={50}
-          height={50}
-        />
-        <Ellipse name="Black" fill="#383838" width={50} height={50} />
-        <Ellipse name="Yellow" fill="#FDBE00" width={50} height={50} />
-        <Ellipse name="Green" fill="#009051" width={50} height={50} />
-        <Ellipse name="Blue" fill="#008FEA" width={50} height={50} />
-        <Ellipse name="Purple" fill="#923BF6" width={50} height={50} />
+        {ColorOption(
+          BackgroundColor.MINT,
+          BackgroundColor.MINT === settings.theme ? "SELECTED" : "NOT_SELECTED",
+          settings.setters.setTheme
+        )}
+        {ColorOption(
+          BackgroundColor.PEACH,
+          BackgroundColor.PEACH === settings.theme
+            ? "SELECTED"
+            : "NOT_SELECTED",
+          settings.setters.setTheme
+        )}
+        {ColorOption(
+          BackgroundColor.DARK_NAVY,
+          BackgroundColor.DARK_NAVY === settings.theme
+            ? "SELECTED"
+            : "NOT_SELECTED",
+
+          settings.setters.setTheme
+        )}
+        {ColorOption(
+          BackgroundColor.GREY,
+          BackgroundColor.GREY === settings.theme ? "SELECTED" : "NOT_SELECTED",
+          settings.setters.setTheme
+        )}
       </AutoLayout>
     </Frame>
   );
@@ -901,7 +968,9 @@ function Title(settings: PlannerSettings) {
   );
 }
 
-function Background(props: AutoLayoutProps): AutoLayout {
+function Background(
+  props: AutoLayoutProps & { theme: BackgroundColor }
+): AutoLayout {
   return (
     <AutoLayout
       name="Background"
@@ -914,7 +983,7 @@ function Background(props: AutoLayoutProps): AutoLayout {
         },
         blur: 6,
       }}
-      fill="#C3EDCF"
+      fill={backgroundColorHex(props.theme)}
       stroke="#17391838"
       cornerRadius={48}
       strokeWidth={3}
@@ -1130,7 +1199,7 @@ function Holes() {
 function WeeklyCalendar(props: WeeklyCalendarProps) {
   const floatingSettings = SettingsMenuFloating(props.plannerSettings);
   return (
-    <Background>
+    <Background theme={props.plannerSettings.theme}>
       <AutoLayout
         name="Calendar"
         direction="vertical"
@@ -1268,6 +1337,7 @@ type PlannerSettings = {
   size: PlannerSize;
   currentDay: Date;
   initialDay: Date;
+  theme: BackgroundColor;
   showSettings: ShowSettings;
   setters: SyncStateSetters;
 };
@@ -1279,6 +1349,7 @@ type SyncStateSetters = {
   setShowSettings: (value: ShowSettings) => void;
   setCurrentDay: (value: Date) => void;
   setInitialDay: (value: Date) => void;
+  setTheme: (value: BackgroundColor) => void;
 };
 
 function weekViewFromString(weekView: string): WeekView {
@@ -1291,6 +1362,21 @@ function weekViewFromString(weekView: string): WeekView {
       return "MONDAY_START_WITHOUT_WEEKENDS";
     default:
       return "SUNDAY_START";
+  }
+}
+
+function themeFromString(theme: string): BackgroundColor {
+  switch (theme) {
+    case "MINT":
+      return BackgroundColor.MINT;
+    case "PEACH":
+      return BackgroundColor.PEACH;
+    case "DARK_NAVY":
+      return BackgroundColor.DARK_NAVY;
+    case "GREY":
+      return BackgroundColor.GREY;
+    default:
+      return BackgroundColor.MINT;
   }
 }
 
@@ -1319,6 +1405,8 @@ function settingsFromSyncedState(): PlannerSettings {
     "showSettings",
     "HIDE"
   );
+
+  const [theme, setTheme] = useSyncedState("theme", "MINT");
   const setters = {
     setTitle,
     setWeekView,
@@ -1326,6 +1414,7 @@ function settingsFromSyncedState(): PlannerSettings {
     setShowSettings,
     setCurrentDay,
     setInitialDay,
+    setTheme,
   };
   return {
     title,
@@ -1333,6 +1422,7 @@ function settingsFromSyncedState(): PlannerSettings {
     size: plannerSizeFromString(size),
     currentDay,
     initialDay,
+    theme: themeFromString(theme),
     showSettings: showSettingsFromString(showSettings),
     setters,
   };
