@@ -625,9 +625,8 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
       stroke="#0006"
       cornerRadius={6}
       width={800}
-      height={900}
-      positioning="absolute"
-      x={-915}
+      height={675}
+      x={125}
       y={0}
     >
       <AutoLayout
@@ -650,6 +649,7 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
           height={80}
           verticalAlignItems="center"
           onClick={() => {
+            // "Refresh"
             settings.setters.setCurrentDay(new Date());
           }}
         >
@@ -690,7 +690,9 @@ function SettingsMenuFloating(settings: PlannerSettings): Frame {
           height={80}
           verticalAlignItems="center"
           onClick={() => {
+            // "Jump to today"
             settings.setters.setInitialDay(new Date());
+            settings.setters.setCurrentDay(new Date());
           }}
         >
           <SVG
@@ -1168,60 +1170,64 @@ function Holes() {
 function WeeklyCalendar(props: WeeklyCalendarProps) {
   const floatingSettings = SettingsMenuFloating(props.plannerSettings);
   return (
-    <Background theme={props.plannerSettings.theme}>
-      <AutoLayout
-        name="Calendar"
-        direction="vertical"
-        horizontalAlignItems="center"
-        overflow="visible"
-        effect={[
-          {
-            type: "drop-shadow",
-            color: "#00000009",
-            offset: {
-              x: 0,
-              y: 0.798,
+    <AutoLayout name="CalendarContainer" overflow="visible">
+      <Background theme={props.plannerSettings.theme}>
+        <AutoLayout
+          name="Calendar"
+          direction="vertical"
+          horizontalAlignItems="center"
+          overflow="visible"
+          effect={[
+            {
+              type: "drop-shadow",
+              color: "#00000009",
+              offset: {
+                x: 0,
+                y: 0.798,
+              },
+              blur: 1.131,
             },
-            blur: 1.131,
-          },
-          {
-            type: "drop-shadow",
-            color: "#0000000E",
-            offset: {
-              x: 0,
-              y: 2.68,
+            {
+              type: "drop-shadow",
+              color: "#0000000E",
+              offset: {
+                x: 0,
+                y: 2.68,
+              },
+              blur: 3.797,
             },
-            blur: 3.797,
-          },
-          {
-            type: "drop-shadow",
-            color: "#00000017",
-            offset: {
-              x: 0,
-              y: 12,
+            {
+              type: "drop-shadow",
+              color: "#00000017",
+              offset: {
+                x: 0,
+                y: 12,
+              },
+              blur: 17,
             },
-            blur: 17,
-          },
-        ]}
-        fill="#FFF"
-        stroke="#0000000D"
-        cornerRadius={19}
-        strokeWidth={2}
-        strokeAlign="outside"
-        padding={{
-          top: 0,
-          right: 80,
-          bottom: 80,
-          left: 80,
-        }}
-      >
-        <Holes />
-        {Title(props.plannerSettings)}
+          ]}
+          fill="#FFF"
+          stroke="#0000000D"
+          cornerRadius={19}
+          strokeWidth={2}
+          strokeAlign="outside"
+          padding={{
+            top: 0,
+            right: 80,
+            bottom: 80,
+            left: 80,
+          }}
+        >
+          <Holes />
+          {Title(props.plannerSettings)}
+          {DayLabels(props.plannerSettings)}
+          {props.weeks.map((week) => Week(week))}
+        </AutoLayout>
+      </Background>
+      <Frame name="SettingColumn" overflow="visible" width={1} height={1}>
         {floatingSettings}
-        {DayLabels(props.plannerSettings)}
-        {props.weeks.map((week) => Week(week))}
-      </AutoLayout>
-    </Background>
+      </Frame>
+    </AutoLayout>
   );
 }
 
