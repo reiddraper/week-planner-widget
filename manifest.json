@@ -4,6 +4,9 @@
   "api": "1.0.0",
   "editorType": ["figjam", "figma"],
   "permissions": [],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
   "containsWidget": true,
   "main": "dist/main.js",
   "widgetApi": "1.0.0"
